@@ -146,19 +146,6 @@ function addMessage(type, message) {
     messageElement.innerHTML = message;
     responseArea.appendChild(messageElement);
 }
-
-  function convertTextToSpeech(text) {
-    // Faz a chamada para a API de conversão de texto para fala
-    fetch(`/sua-rota/gtts?texto=${encodeURIComponent(text)}`)
-      .then(response => response.text())
-      .then(audioUrl => {
-        // Adiciona um elemento de áudio para reproduzir a resposta em voz
-        const audioElement = document.createElement('audio');
-        audioElement.src = audioUrl;
-        audioElement.autoplay = true;
-        responseArea.appendChild(audioElement);
-      });
-  }
 </script>
 
 </body>
