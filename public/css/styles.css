@@ -127,7 +127,7 @@ header {
 }
 
 .inputt {
-  flex: 
+  flex: 1;
   padding: 10px;
   border: none;
   outline: none;
