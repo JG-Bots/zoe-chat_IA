@@ -13,10 +13,8 @@ const secure = require('ssl-express-www');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { exec } = require('child_process');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const gtts = require('./datab/gtts');
 
 const getRandom = (ext) => {
 	return `${Math.floor(Math.random() * 10000)}${ext}`;
@@ -50,41 +48,6 @@ let conversationHistory = [];
 
 // Adicione esta linha para usar o body-parser
 app.use(bodyParser.json());
-
-// ...
-
-app.get('/sua-rota/gtts', async (req, res, next) => {
-  const texto = req.query.texto;
-  if (!texto) return res.json({ status: false, mensagem: "Coloque o parâmetro: texto" });
-
-  const lang = req.query.lang || 'pt-br';
-
-  const ranm = getRandom('.mp3');
-  const rano = getRandom('.ogg');
-
-  if (texto.length > 40000) {
-    return res.json({ status: false, mensagem: 'Para reduzir spam, o máximo de letras permitidas são 5000!' });
-  }
-
-  console.log(`Gerando áudio para o texto: ${texto} com idioma: ${lang}`);
-
-  gtts(lang).save(ranm, texto, function (filePath) {
-    exec(`ffmpeg -i ${ranm} -ar 48000 -vn -c:a libopus ${rano}`, (err) => {
-      fs.unlinkSync(ranm);
-
-      if (err) {
-        console.error('Falha ao processar o áudio:', err);
-        return res.json({ status: false, mensagem: 'Falha ao processar o áudio' });
-      }
-
-      const audioBuffer = fs.readFileSync(rano);
-      res.type('mp3').send(audioBuffer);
-      fs.unlinkSync(rano);
-
-      console.log('Áudio gerado e enviado com sucesso!');
-    });
-  });
-});
 
 // ...
 
