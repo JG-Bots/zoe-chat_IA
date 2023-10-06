@@ -12,12 +12,20 @@ const cors = require('cors');
 const secure = require('ssl-express-www');
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser'); // Adicionando o body-parser
+const bodyParser = require('body-parser');
+const { exec } = require('child_process');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const gtts = require('./datab/gtts');
+
+const getRandom = (ext) => {
+	return `${Math.floor(Math.random() * 10000)}${ext}`;
+};
 
 // ...
 let responses;
 // Caminho do arquivo JSON
-const responsesPath = path.join(__dirname, 'responses.json');
+const responsesPath = path.join(__dirname, '/public/responses.json');
 // Carregar respostas do arquivo JSON
 try {
   const rawResponses = fs.readFileSync(responsesPath);
@@ -42,6 +50,41 @@ let conversationHistory = [];
 
 // Adicione esta linha para usar o body-parser
 app.use(bodyParser.json());
+
+// ...
+
+app.get('/sua-rota/gtts', async (req, res, next) => {
+  const texto = req.query.texto;
+  if (!texto) return res.json({ status: false, mensagem: "Coloque o parâmetro: texto" });
+
+  const lang = req.query.lang || 'pt-br';
+
+  const ranm = getRandom('.mp3');
+  const rano = getRandom('.ogg');
+
+  if (texto.length > 40000) {
+    return res.json({ status: false, mensagem: 'Para reduzir spam, o máximo de letras permitidas são 5000!' });
+  }
+
+  console.log(`Gerando áudio para o texto: ${texto} com idioma: ${lang}`);
+
+  gtts(lang).save(ranm, texto, function (filePath) {
+    exec(`ffmpeg -i ${ranm} -ar 48000 -vn -c:a libopus ${rano}`, (err) => {
+      fs.unlinkSync(ranm);
+
+      if (err) {
+        console.error('Falha ao processar o áudio:', err);
+        return res.json({ status: false, mensagem: 'Falha ao processar o áudio' });
+      }
+
+      const audioBuffer = fs.readFileSync(rano);
+      res.type('mp3').send(audioBuffer);
+      fs.unlinkSync(rano);
+
+      console.log('Áudio gerado e enviado com sucesso!');
+    });
+  });
+});
 
 // ...
 
@@ -96,7 +139,7 @@ app.get('/getResponse', (req, res) => {
 
 app.get('/json', (req, res) => {
 // Lê o arquivo JSON
-fs.readFile('responses.json', 'utf8', (err, data) => {
+fs.readFile('./public/responses.json', 'utf8', (err, data) => {
 if (err) {
 console.error(err);
 return res.status(500).send('Erro ao ler o arquivo JSON');}
