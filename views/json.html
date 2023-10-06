@@ -85,9 +85,9 @@ footer {
 <section>
 <h1 class="center">Dados do JSON</h1>
 <button class="btn" onclick="copiarJSON()">Copiar JSON</button>
-<div class="json-container">
-<pre>{{jsonData}}</pre>
-</div>
+  <div class="json-container">
+    <pre id="jsonContent"></pre>
+  </div>
 </section>
 
 <br>
@@ -99,22 +99,37 @@ footer {
 </footer>
 
 <script>
-  function copiarJSON() {
-    /* Seleciona o conteúdo do elemento pre */
-    var jsonElement = document.querySelector('.json-container pre');
-    var range = document.createRange();
-    range.selectNode(jsonElement);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
+// Função para exibir JSON na página e copiá-lo
+function copiarJSON() {
+  // Faz uma solicitação para obter o conteúdo do arquivo JSON
+  fetch('./responses.json')
+    .then(response => response.json())
+    .then(jsonData => {
+      // Converte o objeto JSON em uma string
+      var jsonString = JSON.stringify(jsonData, null, 2);
 
-    /* Copia o conteúdo selecionado para a área de transferência */
-    document.execCommand('copy');
+      // Atualiza o conteúdo usando textContent
+      document.getElementById('jsonContent').textContent = jsonString;
 
-    /* Limpa a seleção */
-    window.getSelection().removeAllRanges();
+      // Cria um elemento temporário para conter o texto
+      var tempElement = document.createElement('textarea');
+      tempElement.value = jsonString;
 
-    alert('JSON copiado para a área de transferência!');
-  }
+      // Adiciona o elemento temporário ao DOM
+      document.body.appendChild(tempElement);
+
+      // Seleciona o texto dentro do elemento temporário
+      tempElement.select();
+      document.execCommand('copy');
+
+      // Remove o elemento temporário
+      document.body.removeChild(tempElement);
+
+      // Exibe uma mensagem ou realiza outra ação, se necessário
+      alert('JSON copiado para a área de transferência!');
+    })
+    .catch(error => console.error('Erro ao obter o arquivo JSON:', error));
+}
 </script>
 </body>
 </html>

@@ -110,7 +110,6 @@ function sendMessage() {
 
   document.getElementById('userMessage').value = '';
 
-  // Envia a mensagem do usuário e obtém a resposta (simulação)
   fetch(`/getResponse?userMessage=${encodeURIComponent(userMessage)}`)
     .then(response => response.json())
     .then(data => {
@@ -121,8 +120,12 @@ function sendMessage() {
 
         // Adiciona som ao receber mensagem
         playSound('/received-sound.mp3');
+
+        // Converte o texto da resposta em voz
+        convertTextToSpeech(data.Resposta);
       }, 1500);
     });
+
 
   function addMessage(type, message) {
     const messageElement = document.createElement('p');
@@ -136,6 +139,26 @@ function playSound(soundFile) {
   const audio = new Audio(soundFile);
   audio.play();
 }
+
+function addMessage(type, message) {
+    const messageElement = document.createElement('p');
+    messageElement.classList.add('message', type);
+    messageElement.innerHTML = message;
+    responseArea.appendChild(messageElement);
+}
+
+  function convertTextToSpeech(text) {
+    // Faz a chamada para a API de conversão de texto para fala
+    fetch(`/sua-rota/gtts?texto=${encodeURIComponent(text)}`)
+      .then(response => response.text())
+      .then(audioUrl => {
+        // Adiciona um elemento de áudio para reproduzir a resposta em voz
+        const audioElement = document.createElement('audio');
+        audioElement.src = audioUrl;
+        audioElement.autoplay = true;
+        responseArea.appendChild(audioElement);
+      });
+  }
 </script>
 
 </body>
