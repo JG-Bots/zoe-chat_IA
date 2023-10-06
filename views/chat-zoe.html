@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="logo.jpg">
+  <title>Chat Da Zoe</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+<style>
+.fbl-enviar {
+  align-items: center;
+  width: 15px;
+  height: 20px;
+}
+
+.fbl-logo {
+  panding: 2px;
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+}
+
+.fbl-img-chat {
+  width: 100%;
+  panding: 2px;
+  height: auto;
+  border-radius: 3px;
+}
+
+.btns {
+  align-items: center;
+}
+
+.btns {
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+::placeholder {
+  color: #c1c1c1;
+}
+
+button:focus {
+  outline: none;
+}
+
+header p {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding-bottom: 1px;
+  padding-top: 1px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="chat-container flex">
+<div class="chat-container block">
+<header>
+<p class="center btns">
+<button onclick="voltarParaOutraPagina()" class="btns">
+<img class="fbl-enviar" src="9m.png">
+</button>
+<img class="fbl-logo" src="22.png">
+ZOE CHAT
+</p>
+</header>
+</div>
+
+<div class="chat-messages" id="responseArea">
+<!-- Mensagens anteriores aparecerão aqui -->
+</div>
+
+<div class="chat-input">
+<input type="text" placeholder="Mensagem" class="inputt" id="userMessage" name="userMessage">
+<button onclick="sendMessage()" class="button">
+<img class="fbl-enviar" src="b3f.png">
+</button>
+</div>
+
+</div>
+
+<script>
+function voltarParaOutraPagina() {
+window.location.href = "/";
+}
+</script>
+<script>
+function sendMessage() {
+  const userMessage = document.getElementById('userMessage').value;
+  const responseArea = document.getElementById('responseArea');
+  const delay = 10;
+
+  // Verifica se o campo de entrada está vazio
+  if (userMessage.trim() === '') {
+    alert('Escreva algo antes de enviar.');
+    return;
+  }
+
+  // Adiciona a mensagem do usuário à direita
+  responseArea.innerHTML += `<p class="message sent">${userMessage}</p>`;
+
+  // Adiciona som ao enviar mensagem
+  playSound('/sent-sound.mp3');
+
+  document.getElementById('userMessage').value = '';
+
+  // Envia a mensagem do usuário e obtém a resposta (simulação)
+  fetch(`/getResponse?userMessage=${encodeURIComponent(userMessage)}`)
+    .then(response => response.json())
+    .then(data => {
+      // Adiciona um atraso de 1,5 segundos (1500 milissegundos) antes de exibir a resposta
+      setTimeout(() => {
+        // Adiciona a resposta à esquerda
+        addMessage('received', data.Resposta);
+
+        // Adiciona som ao receber mensagem
+        playSound('/received-sound.mp3');
+      }, 1500);
+    });
+
+  function addMessage(type, message) {
+    const messageElement = document.createElement('p');
+    messageElement.classList.add('message', type);
+    messageElement.innerHTML = message;
+    responseArea.appendChild(messageElement);
+  }
+}
+
+function playSound(soundFile) {
+  const audio = new Audio(soundFile);
+  audio.play();
+}
+</script>
+
+</body>
+</html>
