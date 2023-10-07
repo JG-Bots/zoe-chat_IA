@@ -13,7 +13,6 @@ const secure = require('ssl-express-www');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const multer = require('multer');
 
 const getRandom = (ext) => {
 	return `${Math.floor(Math.random() * 10000)}${ext}`;
