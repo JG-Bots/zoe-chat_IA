@@ -81,7 +81,6 @@ header {
 .message.sent, .received {
   max-width: 90%;
   padding: 10px;
-  margin: 8px 0;
   word-wrap: break-word;
   animation: slideIn 0.1s ease-out;
 }
@@ -137,11 +136,6 @@ header {
   margin-right: auto; /* ou margin-left: auto; */
 }
 
-.chat-input2 {
-  align-items: center;
-  padding: 10px;
-}
-
 .chat-input .button {
   padding: 10px 14px;
   background-color: transparent;
@@ -154,6 +148,11 @@ header {
 
 .chat-input button:hover {
   background-color: transparent;
+}
+
+.chat-input2 {
+  align-items: center;
+  padding: 10px;
 }
 
 .chat-input2 {
@@ -183,4 +182,35 @@ header {
 
 .chat-input2 button:hover {
   background-color: #293e69;
+}
+
+.fbl-enviar {
+  align-items: center;
+  width: 15px;
+  height: 20px;
+}
+
+.fbl-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+}
+
+.fbl-img-chat {
+  width: 100%;
+  panding: 2px;
+  height: auto;
+  border-radius: 3px;
+}
+
+.enviar-btn {
+  align-items: center;
+}
+
+.enviar-btn {
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
 }
