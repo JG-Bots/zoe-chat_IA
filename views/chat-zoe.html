@@ -3,42 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="logo.jpg">
+  <link rel="icon" href="77.png">
   <title>Chat Da Zoe</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/styles.css">
 <style>
-.fbl-enviar {
-  align-items: center;
-  width: 15px;
-  height: 20px;
-}
-
-.fbl-logo {
-  panding: 2px;
-  width: 40px;
-  height: 40px;
-  border-radius: 100px;
-}
-
-.fbl-img-chat {
-  width: 100%;
-  panding: 2px;
-  height: auto;
-  border-radius: 3px;
-}
-
-.btns {
-  align-items: center;
-}
-
-.btns {
-  background: none;
-  border: none;
-  border-radius: 100px;
-  cursor: pointer;
-}
-
 ::placeholder {
   color: #c1c1c1;
 }
@@ -53,7 +22,6 @@ header p {
   padding-bottom: 1px;
   padding-top: 1px;
 }
-
 </style>
 
 </head>
@@ -62,11 +30,11 @@ header p {
 <div class="chat-container flex">
 <div class="chat-container block">
 <header>
-<p class="center btns">
-<button onclick="voltarParaOutraPagina()" class="btns">
+<p class="center">
+<button onclick="voltarParaOutraPagina()" class="enviar-btn">
 <img class="fbl-enviar" src="9m.png">
 </button>
-<img class="fbl-logo" src="22.png">
+<img class="fbl-logo" src="77.png">
 ZOE CHAT
 </p>
 </header>
@@ -78,7 +46,7 @@ ZOE CHAT
 
 <div class="chat-input">
 <input type="text" placeholder="Mensagem" class="inputt" id="userMessage" name="userMessage">
-<button onclick="sendMessage()" class="button">
+<button onclick="sendMessage()" class="enviar-btn">
 <img class="fbl-enviar" src="b3f.png">
 </button>
 </div>
@@ -115,24 +83,13 @@ function sendMessage() {
     .then(data => {
       // Adiciona um atraso de 1,5 segundos (1500 milissegundos) antes de exibir a resposta
       setTimeout(() => {
-        // Adiciona a resposta à esquerda
-        addMessage('received', data.Resposta);
+  // Adiciona a mensagem do usuário à direita
+  responseArea.innerHTML += `<p class="message received">${data.Resposta}</p>`;
 
         // Adiciona som ao receber mensagem
-        playSound('/received-sound.mp3');
-
-        // Converte o texto da resposta em voz
-        convertTextToSpeech(data.Resposta);
+        playSound('/received-sound.mp3');;
       }, 1500);
     });
-
-
-  function addMessage(type, message) {
-    const messageElement = document.createElement('p');
-    messageElement.classList.add('message', type);
-    messageElement.innerHTML = message;
-    responseArea.appendChild(messageElement);
-  }
 }
 
 function playSound(soundFile) {
