@@ -13,6 +13,7 @@ const secure = require('ssl-express-www');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 
 const getRandom = (ext) => {
 	return `${Math.floor(Math.random() * 10000)}${ext}`;
@@ -48,11 +49,10 @@ let conversationHistory = [];
 app.use(bodyParser.json());
 
 // ...
-
 app.get('/adicionarResposta', (req, res) => {
 const pergunta = req.query.pergunta;
 const resposta = req.query.resposta;
-  
+
 if (pergunta && resposta) {
 // Verificar se já existe uma resposta para a pergunta
 if (responses[pergunta]) {
