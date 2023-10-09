@@ -85,11 +85,11 @@ app.get('/add-resposta', (req, res) => {
   res.sendFile(__dirname + '/views/add-resposta.html');
 });
 app.get('/api', (req, res) => {
-  res.json({
+res.json({
   nome: "ChatZoe",
   versão: "120230",
   versão_de_codigo: "1.2023.0",
-  link: `a`);
+  link: `a`});
 });
 
 app.get('/api', (req, res) => {
