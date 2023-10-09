@@ -74,13 +74,13 @@ header {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 30px;
   overflow-y: scroll;
 }
 
 .message.sent, .received {
   max-width: 90%;
-  padding: 15px;
+  padding: 10px;
   word-wrap: break-word;
   animation: slideIn 0.1s ease-out;
 }
