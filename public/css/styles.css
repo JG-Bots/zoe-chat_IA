@@ -38,7 +38,7 @@ body, html {
 
 .block {
   display: block;
-  height: 4%;
+  height: 6%;
 }
 
 .flex {
@@ -74,7 +74,7 @@ header {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 30px;
+  padding: 20px;
   overflow-y: scroll;
 }
 
