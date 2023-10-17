@@ -78,7 +78,7 @@ function sendMessage() {
   }
 
   // Adiciona a mensagem do usuário à direita
-  responseArea.innerHTML += `<p class="message sent">${userMessage}</p>`;
+  responseArea.innerHTML += `<p class="message sent">${userMessage}</p><br>`;
 
   // Adiciona som ao enviar mensagem
   playSound('/sent-sound.mp3');
@@ -91,7 +91,7 @@ function sendMessage() {
       // Adiciona um atraso de 1,5 segundos (1500 milissegundos) antes de exibir a resposta
       setTimeout(() => {
   // Adiciona a mensagem do usuário à direita
-  responseArea.innerHTML += `<p class="message received">${data.Resposta}</p>`;
+  responseArea.innerHTML += `<p class="message received">${data.Resposta}</p><br>`;
 
         // Adiciona som ao receber mensagem
         playSound('/received-sound.mp3');;
