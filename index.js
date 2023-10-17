@@ -84,22 +84,9 @@ app.get('/chat', (req, res) => {
 app.get('/add-resposta', (req, res) => {
   res.sendFile(__dirname + '/views/add-resposta.html');
 });
-app.get('/api', (req, res) => {
-res.json({
-  nome: "ChatZoe",
-  versão: "120230",
-  versão_de_codigo: "1.2023.0",
-  link: `a`});
-});
 
 app.get('/api', (req, res) => {
-  const query = req.query.query;
-  const response = generateResponse(query);
-  res.json({ Resposta: response });
-});
-
-app.get('/getResponse', (req, res) => {
-  const userMessage = req.query.userMessage;
+  const userMessage = req.query.query;
   const response = generateResponse(userMessage);
   res.json({ Resposta: response });
 });
