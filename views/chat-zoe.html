@@ -6,7 +6,7 @@
   <link rel="icon" href="77.png">
   <title>Chat Da Zoe</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/chat.css">
 <style>
 ::placeholder {
   color: #c1c1c1;
@@ -38,7 +38,7 @@ p {
 <div class="chat-container block">
 <header>
 <p class="center">
-<button onclick="voltarParaOutraPagina()" class="enviar-btn">
+<button onclick="voltarParaOutraPagina()" class="voltar-btn">
 <img class="fbl-enviar" src="9m.png">
 </button>
 <img class="fbl-logo" src="77.png">
@@ -85,7 +85,7 @@ function sendMessage() {
 
   document.getElementById('userMessage').value = '';
 
-  fetch(`/getResponse?userMessage=${encodeURIComponent(userMessage)}`)
+  fetch(`/api?query=${encodeURIComponent(userMessage)}`)
     .then(response => response.json())
     .then(data => {
       // Adiciona um atraso de 1,5 segundos (1500 milissegundos) antes de exibir a resposta
