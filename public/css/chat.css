@@ -1,0 +1,162 @@
+body, html {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: DimGray;
+}
+
+/* Adicionando uma regra @media para ajustar estilos em telas menores */
+@media screen and (max-width: 768px) {
+  .chat-container {
+    height: auto;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: scroll;
+  }
+
+  .message.sent, .received {
+    max-width: 100%;
+  }
+
+  .chat-input .input {
+    padding: 5px;
+  }
+
+  .chat-input .button {
+    padding: 5px 8px;
+    margin-left: 5px;
+  }
+}
+
+.block {
+  display: block;
+  height: 6%;
+}
+
+.flex {
+  display: flex;
+  height: 100%;
+}
+
+.chat-container {
+  flex-direction: column;
+  justify-content: space-between;
+  background: url(/bru.jpg) no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+header {
+  background-color: #3b3b3b;
+  text-align: left;
+  color: #fff;
+  border-radius: 1px 1px 1px 1px;
+  width: auto; /* Alteração aqui para ajustar à largura do conteúdo */
+}
+
+.chat-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: scroll;
+}
+
+.message.sent, .received {
+  max-width: 90%;
+  padding: 10px;
+  word-wrap: break-word;
+  animation: slideIn 0.1s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.received {
+  align-self: flex-start;
+  background-color: #3b3b3b;
+  color: white;
+  text-align: left;
+  border: 1px solid gray;
+  border-radius: 1px 15px 15px 15px;
+  width: auto; /* Alteração aqui para ajustar à largura do conteúdo */
+  font-size: 13px; /* Ajuste o tamanho da fonte conforme necessário */
+}
+
+.sent {
+  align-self: flex-end;
+  background-color: #005f01;
+  color: white;
+  text-align: left;
+  border: 1px solid gray;
+  border-radius: 15px 1px 15px 15px;
+  width: auto; /* Alteração aqui para ajustar à largura do conteúdo */
+  font-size: 13px; /* Ajuste o tamanho da fonte conforme necessário */
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  background-color: #3b3b3b;
+}
+
+.inputt {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  border-radius: 50px;
+  background-color: #3b3b3b;
+  color: white;
+  margin-right: auto; /* ou margin-left: auto; */
+}
+
+.fbl-enviar {
+  align-items: center;
+  width: 25px;
+  height: 25px;
+}
+
+.fbl-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+}
+
+.fbl-img-chat {
+  width: 100%;
+  panding: 2px;
+  height: auto;
+  border-radius: 3px;
+}
+
+.enviar-btn {
+  padding: 10px 10px;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  align-items: center;
+}
+
+.voltar-btn {
+  padding: 5px 5px;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  align-items: center;
+}
