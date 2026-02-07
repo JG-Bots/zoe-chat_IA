@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <title>Aishia-IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #000;
+            --text: #e0e0ff;
+            --text-secondary: #a0a0cc;
+            --user: #333;
+            --accent: #8b5cf6;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100dvh;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: auto 1fr;
+        }
+
+        /* ── Sidebar (desktop) ── */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: rgba(15, 15, 17, 0.9);
+            border-right: 1px solid #222;
+            padding: 20px;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.4rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 12px 0;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .sidebar li:hover {
+            color: white;
+        }
+
+        /* Header */
+        header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #222;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        /* Área principal do chat */
+        .main-content {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Desktop: empurra o conteúdo pra direita quando sidebar aparece */
+        @media (min-width: 900px) {
+            .main-content {
+                margin-left: var(--sidebar-width);
+            }
+
+            .sidebar {
+                transform: translateX(0);
+            }
+
+            .menu-btn {
+                display: none;
+            }
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #boasvindas {
+            text-align: center;
+            font-size: clamp(2rem, 7vw, 3.2rem);
+            font-weight: 700;
+            margin: 60px 20px;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0 12px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 20px 10px 120px 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #111;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 3px;
+        }
+
+        .user {
+            align-self: flex-end;
+            background: var(--user);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .bot {
+            align-self: flex-start;
+            background: #111;
+            border: 1px solid #222;
+            border-bottom-left-radius: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #777;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Input fixo embaixo */
+        .chat-input-wrapper {
+            position: sticky;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 5;
+            padding: 12px 16px 24px;
+            border-top: 1px solid #222;
+        }
+
+        /* Mensagens (user e bot) */
+        .msg {
+            max-width: 86%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.45;
+            font-size: 1.03rem;
+            animation: fadeIn 0.3s ease;
+
+            /* ── Correção principal de quebra de linha ── */
+            word-break: break-word;
+            /* quebra palavras longas */
+            overflow-wrap: break-word;
+            /* padrão moderno */
+            white-space: pre-wrap;
+            /* respeita quebras manuais e permite wrap */
+            hyphens: auto;
+            /* hífen automático (bom em pt-BR) */
+        }
+
+        /* Também no typing indicator (para ficar consistente) */
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 12px 16px;
+            background: #111;
+            border-radius: 18px;
+            max-width: 86%;
+            display: flex;
+            gap: 6px;
+
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .chat-input2 {
+            margin: 0 20px;
+        }
+
+        .chat-input {
+            display: flex;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 1.9em;
+            padding: 6px 8px 6px 16px;
+
+            width: 100%;
+            /* 👈 ISSO resolve */
+            max-width: 960px;
+            margin: 0 auto;
+
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+
+        .chat-input form {
+            display: flex;
+            align-items: flex-end;
+            width: 100%;
+            gap: 8px;
+        }
+
+
+        .chat-input textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.05rem;
+            padding: 12px 0;
+            resize: none;
+
+            line-height: 1.4;
+            /* base do cálculo */
+            min-height: 1.4em;
+            /* 1 linha */
+            overflow-y: auto;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+
+            scrollbar-width: thin;
+            scrollbar-color: #444 #222;
+        }
+
+
+        .chat-input textarea:focus {
+            outline: none;
+        }
+
+        .chat-input textarea::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-input textarea::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 3px;
+        }
+
+        .chat-input button {
+            background: linear-gradient(135deg, var(--accent), #7c3aed);
+            width: 48px;
+            height: 48px;
+            border-radius: 30em;
+            border: none;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar (desktop ou aberto no mobile) -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Aishia-IA</h2>
+            <button class="menu-btn" onclick="toggleSidebar()">×</button>
+        </div>
+        <ul>
+            <li>Nova conversa</li>
+        </ul>
+    </nav>
+
+    <header>
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <h1>Aishia-IA</h1>
+        <div style="width: 40px;"></div> <!-- spacer -->
+    </header>
+
+    <div class="main-content">
+        <main>
+            <h2 id="boasvindas">O que tem em mente hoje?</h2>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+            </div>
+            <div class="chat-input2">
+                <div class="chat-input">
+                    <form id="chat-form">
+                        <textarea id="userInput" placeholder="Pergunte alguma coisa..." autocomplete="off"
+                            rows="1"></textarea>
+                        <button type="submit">↩</button>
+                    </form>
+                </div>
+                <p style="text-align: center;margin-top: 8px;margin-bottom: 8px;font-size: small;">O Aishia-IA pode
+                    cometer erros.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("userInput");
+        const chat = document.getElementById("chat-messages");
+        const boasVindas = document.getElementById("boasvindas");
+        const sidebar = document.getElementById("sidebar");
+
+        const MAX_LINES = 9;
+
+        /* ─────────── textarea auto resize ─────────── */
+        function autoResizeTextarea(el) {
+            el.style.height = "auto";
+
+            const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+            const maxHeight = lineHeight * MAX_LINES;
+
+            if (el.scrollHeight <= maxHeight) {
+                el.style.height = el.scrollHeight + "px";
+                el.style.overflowY = "hidden";
+            } else {
+                el.style.height = maxHeight + "px";
+                el.style.overflowY = "auto";
+            }
+        }
+
+        input.addEventListener("input", () => {
+            autoResizeTextarea(input);
+        });
+
+        /* ─────────── sidebar ─────────── */
+        function toggleSidebar() {
+            sidebar.classList.toggle("active");
+        }
+
+        window.toggleSidebar = toggleSidebar;
+
+        /* ─────────── scroll ─────────── */
+        function scrollToBottom() {
+            setTimeout(() => {
+                chat.scrollTo({
+                    top: chat.scrollHeight,
+                    behavior: "smooth"
+                });
+            }, 50);
+        }
+
+        /* ─────────── typewriter ─────────── */
+        function typeWriter(element, text, speed = 20) {
+            let i = 0;
+            element.textContent = "";
+
+            const interval = setInterval(() => {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    scrollToBottom();
+                } else {
+                    clearInterval(interval);
+                }
+            }, speed);
+        }
+
+        /* ─────────── typing indicator ─────────── */
+        function showTyping() {
+            const typing = document.createElement("div");
+            typing.className = "typing-indicator";
+            typing.id = "typing";
+            typing.innerHTML = `
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        `;
+            chat.appendChild(typing);
+            scrollToBottom();
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById("typing");
+            if (typing) typing.remove();
+        }
+
+        /* ─────────── envio de mensagem ─────────── */
+        async function enviarMensagem(e) {
+            if (e) e.preventDefault();
+
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            boasVindas.style.display = "none";
+
+            /* mensagem do usuário */
+            const msgUser = document.createElement("div");
+            msgUser.className = "msg user";
+            msgUser.textContent = texto;
+            chat.appendChild(msgUser);
+
+            input.value = "";
+            autoResizeTextarea(input);
+            input.focus();
+            scrollToBottom();
+
+            /* typing */
+            showTyping();
+
+            try {
+                const response = await puter.ai.chat(
+                    `Você é a Aishia, uma IA kwaii, carismática e fofa.\nUsuário: ${texto}`,
+                    { model: "gpt-5-nano" }
+                );
+
+                removeTyping();
+
+                const msgBot = document.createElement("div");
+                msgBot.className = "msg bot";
+                chat.appendChild(msgBot);
+
+                const resposta =
+                    typeof response === "string"
+                        ? response
+                        : response?.message?.content
+                        || response?.text
+                        || "⚠️ A IA respondeu, mas sem texto.";
+
+
+                typeWriter(msgBot, resposta, 12);
+
+            } catch (err) {
+                removeTyping();
+
+                const msgBot = document.createElement("div");
+                msgBot.className = "msg bot";
+                msgBot.textContent = "⚠️ Erro ao falar com a IA. Tenta novamente.";
+                chat.appendChild(msgBot);
+
+                console.error(err);
+            }
+        }
+
+        form.addEventListener("submit", enviarMensagem);
+
+        /* enter envia / shift+enter quebra linha */
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensagem();
+            }
+        });
+
+        /* fecha sidebar ao clicar fora (mobile) */
+        document.addEventListener("click", (e) => {
+            if (window.innerWidth < 900 && sidebar.classList.contains("active")) {
+                if (!sidebar.contains(e.target) && !e.target.classList.contains("menu-btn")) {
+                    sidebar.classList.remove("active");
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
