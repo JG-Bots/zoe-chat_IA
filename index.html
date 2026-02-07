@@ -393,165 +393,208 @@
         </main>
     </div>
 
-    <script src="https://js.puter.com/v2/"></script>
-    <script>
-        const form = document.getElementById("chat-form");
-        const input = document.getElementById("userInput");
-        const chat = document.getElementById("chat-messages");
-        const boasVindas = document.getElementById("boasvindas");
-        const sidebar = document.getElementById("sidebar");
+<script src="https://js.puter.com/v2/"></script>
+<script>
+const form = document.getElementById("chat-form");
+const input = document.getElementById("userInput");
+const chat = document.getElementById("chat-messages");
+const boasVindas = document.getElementById("boasvindas");
+const sidebar = document.getElementById("sidebar");
 
-        const MAX_LINES = 9;
+const MAX_LINES = 9;
+const STORAGE_KEY = "aishia_chat_history";
 
-        /* ─────────── textarea auto resize ─────────── */
-        function autoResizeTextarea(el) {
-            el.style.height = "auto";
+/* ─────────── textarea auto resize ─────────── */
+function autoResizeTextarea(el) {
+    el.style.height = "auto";
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+    const maxHeight = lineHeight * MAX_LINES;
 
-            const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
-            const maxHeight = lineHeight * MAX_LINES;
+    if (el.scrollHeight <= maxHeight) {
+        el.style.height = el.scrollHeight + "px";
+        el.style.overflowY = "hidden";
+    } else {
+        el.style.height = maxHeight + "px";
+        el.style.overflowY = "auto";
+    }
+}
 
-            if (el.scrollHeight <= maxHeight) {
-                el.style.height = el.scrollHeight + "px";
-                el.style.overflowY = "hidden";
-            } else {
-                el.style.height = maxHeight + "px";
-                el.style.overflowY = "auto";
-            }
-        }
+input.addEventListener("input", () => autoResizeTextarea(input));
 
-        input.addEventListener("input", () => {
-            autoResizeTextarea(input);
-        });
+/* ─────────── sidebar ─────────── */
+function toggleSidebar() {
+    sidebar.classList.toggle("active");
+}
+window.toggleSidebar = toggleSidebar;
 
-        /* ─────────── sidebar ─────────── */
-        function toggleSidebar() {
-            sidebar.classList.toggle("active");
-        }
+/* ─────────── scroll ─────────── */
+function scrollToBottom(smooth = true) {
+    chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: smooth ? "smooth" : "auto"
+    });
+}
 
-        window.toggleSidebar = toggleSidebar;
+/* ─────────── typewriter ─────────── */
+function typeWriter(element, text, speed = 15) {
+    let i = 0;
+    element.textContent = "";
 
-        /* ─────────── scroll ─────────── */
-        function scrollToBottom() {
-            setTimeout(() => {
-                chat.scrollTo({
-                    top: chat.scrollHeight,
-                    behavior: "smooth"
-                });
-            }, 50);
-        }
-
-        /* ─────────── typewriter ─────────── */
-        function typeWriter(element, text, speed = 20) {
-            let i = 0;
-            element.textContent = "";
-
-            const interval = setInterval(() => {
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    scrollToBottom();
-                } else {
-                    clearInterval(interval);
-                }
-            }, speed);
-        }
-
-        /* ─────────── typing indicator ─────────── */
-        function showTyping() {
-            const typing = document.createElement("div");
-            typing.className = "typing-indicator";
-            typing.id = "typing";
-            typing.innerHTML = `
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        `;
-            chat.appendChild(typing);
+    const interval = setInterval(() => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
             scrollToBottom();
+        } else {
+            clearInterval(interval);
+        }
+    }, speed);
+}
+
+/* ─────────── typing indicator ─────────── */
+function showTyping() {
+    const typing = document.createElement("div");
+    typing.className = "typing-indicator";
+    typing.id = "typing";
+    typing.innerHTML = `
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    `;
+    chat.appendChild(typing);
+    scrollToBottom();
+}
+
+function removeTyping() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+}
+
+/* ─────────── histórico ─────────── */
+function salvarHistorico(user, bot) {
+    const historico = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    historico.push({ user, bot });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(historico));
+}
+
+function carregarHistorico() {
+    const historico = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    historico.forEach(msg => {
+        if (msg.user) {
+            const u = document.createElement("div");
+            u.className = "msg user";
+            u.textContent = msg.user;
+            chat.appendChild(u);
         }
 
-        function removeTyping() {
-            const typing = document.getElementById("typing");
-            if (typing) typing.remove();
+        if (msg.bot) {
+            const b = document.createElement("div");
+            b.className = "msg bot";
+            b.textContent = msg.bot; // 👈 SEM typewriter no histórico
+            chat.appendChild(b);
         }
+    });
 
-        /* ─────────── envio de mensagem ─────────── */
-        async function enviarMensagem(e) {
-            if (e) e.preventDefault();
+    if (historico.length > 0) boasVindas.style.display = "none";
 
-            const texto = input.value.trim();
-            if (!texto) return;
+    // força scroll depois que tudo renderizar
+    setTimeout(() => {
+        scrollToBottom(false);
+    }, 0);
+}
 
-            boasVindas.style.display = "none";
+/* ─────────── envio de mensagem ─────────── */
+async function enviarMensagem(e) {
+    if (e) e.preventDefault();
 
-            /* mensagem do usuário */
-            const msgUser = document.createElement("div");
-            msgUser.className = "msg user";
-            msgUser.textContent = texto;
-            chat.appendChild(msgUser);
+    const texto = input.value.trim();
+    if (!texto) return;
 
-            input.value = "";
-            autoResizeTextarea(input);
-            input.focus();
-            scrollToBottom();
+    boasVindas.style.display = "none";
 
-            /* typing */
-            showTyping();
+    /* mensagem do usuário */
+    const msgUser = document.createElement("div");
+    msgUser.className = "msg user";
+    msgUser.textContent = texto;
+    chat.appendChild(msgUser);
 
-            try {
-                const response = await puter.ai.chat(
-                    `Você é a Aishia, uma IA kwaii, carismática e fofa.\nUsuário: ${texto}`,
-                    { model: "gpt-5-nano" }
-                );
+    input.value = "";
+    autoResizeTextarea(input);
+    input.focus();
+    scrollToBottom();
 
-                removeTyping();
+    showTyping();
 
-                const msgBot = document.createElement("div");
-                msgBot.className = "msg bot";
-                chat.appendChild(msgBot);
+    try {
+        const historico = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-                const resposta =
-                    typeof response === "string"
-                        ? response
-                        : response?.message?.content
-                        || response?.text
-                        || "⚠️ A IA respondeu, mas sem texto.";
+        const contexto = historico
+            .slice(-10) // 👈 limita contexto (memória curta fake)
+            .map(h => `Usuário: ${h.user}\nAishia: ${h.bot}`)
+            .join("\n");
 
+        const prompt = `
+Você é a Aishia, uma IA kawaii, carismática e fofa.
+${contexto}
+Usuário: ${texto}
+        `.trim();
 
-                typeWriter(msgBot, resposta, 12);
-
-            } catch (err) {
-                removeTyping();
-
-                const msgBot = document.createElement("div");
-                msgBot.className = "msg bot";
-                msgBot.textContent = "⚠️ Erro ao falar com a IA. Tenta novamente.";
-                chat.appendChild(msgBot);
-
-                console.error(err);
-            }
-        }
-
-        form.addEventListener("submit", enviarMensagem);
-
-        /* enter envia / shift+enter quebra linha */
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                enviarMensagem();
-            }
+        const response = await puter.ai.chat(prompt, {
+            model: "gpt-5-nano"
         });
 
-        /* fecha sidebar ao clicar fora (mobile) */
-        document.addEventListener("click", (e) => {
-            if (window.innerWidth < 900 && sidebar.classList.contains("active")) {
-                if (!sidebar.contains(e.target) && !e.target.classList.contains("menu-btn")) {
-                    sidebar.classList.remove("active");
-                }
-            }
-        });
-    </script>
+        removeTyping();
 
+        const resposta =
+            typeof response === "string"
+                ? response
+                : response?.message?.content
+                || response?.text
+                || "⚠️ A IA respondeu, mas sem texto.";
+
+        const msgBot = document.createElement("div");
+        msgBot.className = "msg bot";
+        chat.appendChild(msgBot);
+
+        typeWriter(msgBot, resposta, 12);
+
+        salvarHistorico(texto, resposta);
+
+    } catch (err) {
+        removeTyping();
+
+        const msgBot = document.createElement("div");
+        msgBot.className = "msg bot";
+        msgBot.textContent = "⚠️ Erro ao falar com a IA. Tenta novamente.";
+        chat.appendChild(msgBot);
+
+        console.error(err);
+    }
+}
+
+form.addEventListener("submit", enviarMensagem);
+
+/* enter envia / shift+enter quebra linha */
+input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        enviarMensagem();
+    }
+});
+
+/* fecha sidebar ao clicar fora (mobile) */
+document.addEventListener("click", (e) => {
+    if (window.innerWidth < 900 && sidebar.classList.contains("active")) {
+        if (!sidebar.contains(e.target) && !e.target.classList.contains("menu-btn")) {
+            sidebar.classList.remove("active");
+        }
+    }
+});
+
+/* ─────────── carregar histórico ao abrir ─────────── */
+carregarHistorico();
+</script>
 </body>
 
 </html>
